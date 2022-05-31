@@ -1,28 +1,23 @@
-const { fromEvent } = rxjs
-const { debounceTime } = rxjs.operators
-
-const btnMinus = document.querySelector('#minus')
-const btnPlus = document.querySelector('#plus')
-const counter = document.querySelector('.counter')
+const { fromEvent, Observable, BehaviorSubject } = rxjs
 
 let i = 0
 
-const [ onBtnMinusClick$, onBtnPlusClick$ ] = [ fromEvent(btnMinus, 'click'), fromEvent(btnPlus, 'click') ]
+const onBtnPlusClick$ = fromEvent(document.querySelector('#plus'), 'click') // create an observable for event listener
+const onBtnMinusClick$ = fromEvent(document.querySelector('#minus'), 'click')
+const numberEmitter$ = new BehaviorSubject(i)
 
-fromEvent(window, 'load').subscribe(
-  counter.innerText = i
-)
+function increment() {
+  numberEmitter$.next(++i)
+}
 
-onBtnMinusClick$
-.subscribe(
-  () => {
-    counter.innerText = --i
-  }
-)
+function decrement() {
+  numberEmitter$.next(--i)
+}
 
-onBtnPlusClick$
-.subscribe(
-  () => {
-    counter.innerText = ++i
-  }
-)
+function setValueInCounter(value) {
+  document.querySelector('.counter').innerText = value
+}
+
+onBtnPlusClick$.subscribe(increment)
+onBtnMinusClick$.subscribe(decrement)
+numberEmitter$.subscribe(setValueInCounter)
